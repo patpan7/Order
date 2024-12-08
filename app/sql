@@ -1,0 +1,37 @@
+USE [Orders]
+GO
+/****** Object:  Table [dbo].[categories]    Script Date: 9/12/2024 1:45:36 πμ ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[categories](
+	[cat_id] [int] NULL,
+	[cat_name] [nvarchar](50) NULL,
+	[cat_status] [int] NULL
+) ON [PRIMARY]
+GO
+/****** Object:  Table [dbo].[products]    Script Date: 9/12/2024 1:45:36 πμ ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[products](
+	[prod_id] [int] NULL,
+	[prod_name] [nvarchar](50) NULL,
+	[prod_price] [float] NULL,
+	[prod_cat] [int] NULL,
+	[prod_status] [int] NULL
+) ON [PRIMARY]
+GO
+/****** Object:  Table [dbo].[tables]    Script Date: 9/12/2024 1:45:36 πμ ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[tables](
+	[table_id] [int] NOT NULL,
+	[table_name] [nvarchar](50) NOT NULL,
+	[status] [int] NULL
+) ON [PRIMARY]
+GO

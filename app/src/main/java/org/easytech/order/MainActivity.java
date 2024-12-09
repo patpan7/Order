@@ -4,35 +4,34 @@ import android.content.Intent;
 import android.os.Bundle;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import java.util.List;
 
-public class MainActivity extends AppCompatActivity implements TableAdapter.OnTableClickListener {
+public class MainActivity extends AppCompatActivity {
 
-    private RecyclerView recyclerViewTables;
-    private TableAdapter adapter;
-    List<Table> tableList = null;
+    CardView cardTables;
+    CardView cardSettings;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        recyclerViewTables = findViewById(R.id.recyclerViewTables);
-        recyclerViewTables.setLayoutManager(new GridLayoutManager(this, 3)); // 3 τραπέζια ανά σειρά
+        cardTables = findViewById(R.id.cardTables);
+        cardSettings = findViewById(R.id.cardSettings);
 
-        DBHelper dbHelper = new DBHelper(this);
+        cardTables.setOnClickListener(view -> {
+            Intent intent = new Intent(MainActivity.this, TablesActivity.class);
+            startActivity(intent);
+        });
 
-        tableList = dbHelper.getTables();
-        adapter = new TableAdapter(tableList, this);
-        recyclerViewTables.setAdapter(adapter);
+        cardSettings.setOnClickListener(view -> {
+            Intent intent = new Intent(MainActivity.this, SettingsActivity.class);
+            startActivity(intent);
+        });
+
     }
 
-    @Override
-    public void onTableClick(int position) {
-        // Μετάβαση στην επόμενη οθόνη (π.χ. Activity για κατηγορίες προϊόντων)
-        Intent intent = new Intent(this, CategoryActivity.class);
-        intent.putExtra("tableNumber", tableList.get(position).getTable_id());
-        startActivity(intent);
-    }
 }

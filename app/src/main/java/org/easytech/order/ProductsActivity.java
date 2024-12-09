@@ -6,6 +6,7 @@ import android.widget.Button;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import java.util.List;
@@ -24,9 +25,11 @@ public class ProductsActivity extends AppCompatActivity implements ProductAdapte
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_products);
+        SettingsHelper settingsHelper = new SettingsHelper(this);
 
+        int tablesCol = settingsHelper.getCols("products_col");
         recyclerViewProducts = findViewById(R.id.recyclerViewProducts);
-        recyclerViewProducts.setLayoutManager(new LinearLayoutManager(this));
+        recyclerViewProducts.setLayoutManager(new GridLayoutManager(this, tablesCol));
 
         // Αποκτήστε την κατηγορία από το intent
         int category = getIntent().getIntExtra("category",0);

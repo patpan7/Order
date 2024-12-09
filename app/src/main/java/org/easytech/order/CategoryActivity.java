@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.widget.Button;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import java.util.List;
@@ -22,9 +23,11 @@ public class CategoryActivity extends AppCompatActivity implements CategoryAdapt
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_category);
+        SettingsHelper settingsHelper = new SettingsHelper(this);
 
+        int tablesCol = settingsHelper.getCols("categories_col");
         recyclerViewCategories = findViewById(R.id.recyclerViewCategories);
-        recyclerViewCategories.setLayoutManager(new LinearLayoutManager(this));
+        recyclerViewCategories.setLayoutManager(new GridLayoutManager(this, tablesCol));
 
         // Αποκτήστε τον αριθμό τραπεζιού από το intent
         tableNumber = getIntent().getIntExtra("tableNumber", -1);

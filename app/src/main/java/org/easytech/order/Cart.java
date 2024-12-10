@@ -70,6 +70,8 @@ public class Cart implements Parcelable {
         cartItems.remove(product);
     }
 
+    public void clearCart() {cartItems.clear();}
+
     // Parcelable implementation
     protected Cart(Parcel in) {
         cartItems = in.createTypedArrayList(Product.CREATOR);

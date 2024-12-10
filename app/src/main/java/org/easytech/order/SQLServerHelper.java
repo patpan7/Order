@@ -8,6 +8,7 @@ import android.util.Log;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -165,5 +166,53 @@ public class SQLServerHelper {
         return products;
     }
 
+    public boolean syncOrderWithServer() {
+        DBHelper dbHelper = new DBHelper(context);
+        SQLServerHelper sqlServerHelper = new SQLServerHelper(context);
+
+        List<Order> unsyncedOrders = dbHelper.getUnsyncedOrders();
+
+        if (unsyncedOrders.isEmpty()) {
+            Log.i("Sync", "Όλες οι παραγγελίες είναι συγχρονισμένες.");
+            return true;
+        }
+
+        try (Connection con = sqlServerHelper.CONN();
+             PreparedStatement orderStmt = con.prepareStatement(
+                     "INSERT INTO Orders (table_id, total_amount, timestamp) VALUES (?, ?, ?)", Statement.RETURN_GENERATED_KEYS);
+             PreparedStatement detailStmt = con.prepareStatement(
+                     "INSERT INTO OrderDetails (order_id, prod_id, quantity, price) VALUES (?, ?, ?, ?)")) {
+
+            for (Order order : unsyncedOrders) {
+                orderStmt.setInt(1, order.getTableId());
+                orderStmt.setDouble(2, order.getOrderTotal());
+                orderStmt.setString(3, order.getTimestamp());
+                orderStmt.executeUpdate();
+
+                ResultSet rs = orderStmt.getGeneratedKeys();
+                int serverOrderId = 0;
+                if (rs.next()) {
+                    serverOrderId = rs.getInt(1);
+                }
+
+                List<OrderDetail> orderDetails = dbHelper.getOrderDetails(order.getOrderId());
+                for (OrderDetail detail : orderDetails) {
+                    detailStmt.setInt(1, serverOrderId);
+                    detailStmt.setInt(2, detail.getProductId());
+                    detailStmt.setInt(3, detail.getQuantity());
+                    detailStmt.setDouble(4, detail.getPrice());
+                    detailStmt.executeUpdate();
+                }
+
+                dbHelper.markOrderAsSynced(order.getOrderId());
+            }
+        } catch (SQLException e) {
+            Log.e("Sync", "Σφάλμα συγχρονισμού: " + e.getMessage());
+            return false;
+        }
+
+        Log.i("Sync", "Ο συγχρονισμός ολοκληρώθηκε επιτυχώς.");
+        return true;
+    }
 }
 

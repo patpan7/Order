@@ -39,6 +39,5 @@ dependencies {
     androidTestImplementation libs.ext.junit
     androidTestImplementation libs.espresso.core
     implementation libs.jtds
-
-
+    implementation libs.escpos.thermalprinter.android
 }

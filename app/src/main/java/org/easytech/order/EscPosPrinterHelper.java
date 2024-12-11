@@ -2,6 +2,7 @@ package org.easytech.order;
 
 import android.util.Log;
 
+import com.dantsu.escposprinter.EscPosCharsetEncoding;
 import com.dantsu.escposprinter.EscPosPrinter;
 import com.dantsu.escposprinter.connection.tcp.TcpConnection;
 
@@ -12,6 +13,7 @@ public class EscPosPrinterHelper {
     private String printerIpAddress;
     private int printerPort;
     private EscPosPrinter printer;
+    private TcpConnection tcpConnection;
 
     // Callback interface για την εκτύπωση
     public interface PrintCallback {
@@ -29,9 +31,14 @@ public class EscPosPrinterHelper {
     public void connectPrinterAsync(Runnable onSuccess, Runnable onFailure) {
         new Thread(() -> {
             try {
-                TcpConnection connection = new TcpConnection(printerIpAddress, printerPort);
-                connection.connect();
-                printer = new EscPosPrinter(connection, 203, 48, 32,); // 203 DPI, 48 χαρακτήρες ανά γραμμή
+                // Έλεγχος αν υπάρχει ανοιχτή σύνδεση
+                if (tcpConnection != null) {
+                    tcpConnection.disconnect();
+                }
+
+                tcpConnection = new TcpConnection(printerIpAddress, printerPort);
+                tcpConnection.connect();
+                printer = new EscPosPrinter(tcpConnection, 203, 72, 48, new EscPosCharsetEncoding("Cp737", 64)); // 203 DPI, 48 χαρακτήρες ανά γραμμή
                 onSuccess.run();
             } catch (Exception e) {
                 e.printStackTrace();
@@ -46,7 +53,7 @@ public class EscPosPrinterHelper {
             try {
                 // Δημιουργία του κειμένου της απόδειξης
                 StringBuilder receipt = new StringBuilder();
-                receipt.append("Παραγγελία #").append(orderId).append("\n");
+                receipt.append("[C]<font size='big'><b>Παραγγελία #").append(orderId).append("</b></font>\n");
                 receipt.append("-------------------------------\n");
                 Log.e("cartitems", cartItems.size()+"");
                 for (Product product : cartItems) {
@@ -66,16 +73,31 @@ public class EscPosPrinterHelper {
                     total += product.getProd_price() * product.getQuantity();
                 }
 
-                receipt.append("Σύνολο: ").append(total).append("€\n\n\n\n\n");
-
+                receipt.append("Σύνολο: ").append(total).append("€\n\n\n\n\n.");
                 // Εκτύπωση και κόψιμο χαρτιού
                 printer.printFormattedTextAndCut(receipt.toString());
                 Log.d("EscPosPrinterHelper", "Εκτύπωση επιτυχής:\n" + receipt);
+                // Αποσύνδεση
+                disconnectPrinter();
                 callback.onSuccess();
             } catch (Exception e) {
                 e.printStackTrace();
+                // Αποσύνδεση
+                disconnectPrinter();
                 callback.onError(e);
             }
         }, () -> callback.onError(new Exception("Αποτυχία σύνδεσης με τον εκτυπωτή")));
+    }
+
+    // Μέθοδος για αποσύνδεση
+    private void disconnectPrinter() {
+        try {
+            if (tcpConnection != null) {
+                tcpConnection.disconnect();
+                tcpConnection = null;
+            }
+        } catch (Exception e) {
+            Log.e("EscPosPrinterHelper", "Σφάλμα κατά την αποσύνδεση: " + e.getMessage());
+        }
     }
 }

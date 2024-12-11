@@ -19,7 +19,7 @@ public class ProductsActivity extends AppCompatActivity implements ProductAdapte
     private Cart cart;
     private Button checkoutButton;
     private CartAdapter cartAdapter;
-    private int tableNumber;
+    private int tableid;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -35,9 +35,9 @@ public class ProductsActivity extends AppCompatActivity implements ProductAdapte
         int category = getIntent().getIntExtra("category",0);
         setTitle("Προϊόντα για " + category);
 
-        tableNumber = getIntent().getIntExtra("tableNumber", -1);
+        tableid = getIntent().getIntExtra("tableid", -1);
 
-        cart = Cart.getInstance(tableNumber);
+        cart = Cart.getInstance(tableid);
         // Δημιουργία λίστας προϊόντων για την επιλεγμένη κατηγορία
         DBHelper dbHelper = new DBHelper(this);
         productList = dbHelper.getProducts(category);
@@ -79,7 +79,7 @@ public class ProductsActivity extends AppCompatActivity implements ProductAdapte
     private void openCart() {
         Intent intent = new Intent(ProductsActivity.this, CartActivity.class);
         intent.putExtra("cart", cart);  // Περάστε το καλάθι στην επόμενη δραστηριότητα
-        intent.putExtra("tableNumber", tableNumber); // Προσθέστε το αριθμό του τραπέζιου στο intent
+        intent.putExtra("tableid", tableid); // Προσθέστε το αριθμό του τραπέζιου στο intent
         startActivity(intent);
     }
 

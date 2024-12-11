@@ -3,18 +3,10 @@ package org.easytech.order;
 import android.annotation.SuppressLint;
 import android.content.ContentValues;
 import android.content.Context;
-import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
-import android.os.StrictMode;
-import android.util.Log;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -340,4 +332,27 @@ public class DBHelper extends SQLiteOpenHelper {
     }
 
 
+    public boolean tableSetStatus(int tableid, int status) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put("status", status);  // Ενημέρωση του status
+
+        // Ενημέρωση της κατάστασης του τραπεζιού
+        int rowsAffected = db.update(TABLE_TABLES, values, "table_id = ?", new String[]{String.valueOf(tableid)});
+        db.close();
+
+        return rowsAffected > 0;
+    }
+
+    @SuppressLint("Range")
+    public int tableGetStatus(int tableId) {
+        int status = 0;
+        SQLiteDatabase db = this.getReadableDatabase();
+        String query = "SELECT status FROM " + TABLE_TABLES + " WHERE table_id = ?";
+        Cursor cursor = db.rawQuery(query, new String[]{String.valueOf(tableId)});
+        if (cursor.moveToFirst()) {
+            status = cursor.getInt(cursor.getColumnIndex("status"));
+        }
+        return status;
+    }
 }

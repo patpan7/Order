@@ -17,7 +17,7 @@ public class CategoryActivity extends AppCompatActivity implements CategoryAdapt
     private List<Category> categoryList = null;
     private Button checkoutButton;
     private Cart cart;
-    private int tableNumber;
+    private int tableid;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -30,10 +30,10 @@ public class CategoryActivity extends AppCompatActivity implements CategoryAdapt
         recyclerViewCategories.setLayoutManager(new GridLayoutManager(this, tablesCol));
 
         // Αποκτήστε τον αριθμό τραπεζιού από το intent
-        tableNumber = getIntent().getIntExtra("tableNumber", -1);
-        setTitle("Κατηγορίες για " + tableNumber);
+        tableid = getIntent().getIntExtra("tableid", -1);
+        setTitle("Κατηγορίες για " + tableid);
 
-        cart = Cart.getInstance(tableNumber);
+        cart = Cart.getInstance(tableid);
 
         DBHelper dbHelper = new DBHelper(this);
         categoryList = dbHelper.getCategories();
@@ -50,7 +50,7 @@ public class CategoryActivity extends AppCompatActivity implements CategoryAdapt
         // Μετάβαση στην επόμενη οθόνη (π.χ. Activity για προϊόντα)
         Intent intent = new Intent(this, ProductsActivity.class);
         intent.putExtra("category", categoryList.get(position).getCat_id());
-        intent.putExtra("tableNumber", tableNumber);
+        intent.putExtra("tableid", tableid);
         startActivity(intent);
     }
 
@@ -58,7 +58,7 @@ public class CategoryActivity extends AppCompatActivity implements CategoryAdapt
     private void openCart() {
         Intent intent = new Intent(CategoryActivity.this, CartActivity.class);
         intent.putExtra("cart", cart);  // Περάστε το καλάθι στην επόμενη δραστηριότητα
-        intent.putExtra("tableNumber", tableNumber); // Προσθέστε το αριθμό του τραπέζιου στο intent
+        intent.putExtra("tableid", tableid); // Προσθέστε το αριθμό του τραπέζιου στο intent
         startActivity(intent);
     }
 }

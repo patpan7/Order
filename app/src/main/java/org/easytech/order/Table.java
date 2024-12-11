@@ -1,5 +1,7 @@
 package org.easytech.order;
 
+import android.util.Log;
+
 public class Table {
     private int table_id;
     private String table_name;;
@@ -33,5 +35,13 @@ public class Table {
 
     public void setStatus(int status) {
         this.status = status;
+    }
+
+    public String print(){
+        return ("table{" +
+                "tableid = " + table_id +
+                ", tablename = " + table_name +
+                ", status = " + status +
+                "}");
     }
 }

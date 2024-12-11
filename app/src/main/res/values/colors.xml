@@ -101,4 +101,13 @@
     <color name="card_border_light">#001F2A</color>
     <color name="card_border_dark">#BEE9FF</color>
 
+    <!-- Light tables-->
+    <color name="colorTableDefaultLight">#FFFFFF</color> <!-- Άσπρο για light theme -->
+    <color name="colorTableReservedLight">#B95C50</color> <!-- Ροζ για δεσμευμένα -->
+
+    <!-- Dark tables-->
+    <color name="colorTableDefaultDark">#424242</color> <!-- Άσπρο για light theme -->
+    <color name="colorTableReservedDark">#B71C1C</color> <!-- Ροζ για δεσμευμένα -->
+
+
 </resources>

@@ -1,5 +1,6 @@
 package org.easytech.order;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.widget.Button;
 import android.widget.TextView;
@@ -11,6 +12,8 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.dantsu.escposprinter.EscPosPrinter;
 
 import java.util.DoubleSummaryStatistics;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class CartActivity extends AppCompatActivity {
 
@@ -19,7 +22,7 @@ public class CartActivity extends AppCompatActivity {
     private Cart cart;  // Αντικείμενο Cart
     private Button printButton;
     private TextView totalPriceTextView;
-    private int tableNumber;
+    private int tableid;
     DBHelper dbHelper;
     Double sum;
 
@@ -31,7 +34,7 @@ public class CartActivity extends AppCompatActivity {
         /// Ανάκτηση του καλαθιού από το Intent
         cart = getIntent().getParcelableExtra("cart");
 
-        tableNumber = getIntent().getIntExtra("tableNumber", -1);
+        tableid = getIntent().getIntExtra("tableid", -1);
 
         // Εδώ αρχικοποιούμε το cart εάν δεν έχει ήδη περαστεί
         if (cart == null) {
@@ -66,22 +69,31 @@ public class CartActivity extends AppCompatActivity {
 
     // Μέθοδος για την αποστολή της παραγγελίας στον εκτυπωτή
     private void handleSaveAndPrint() {
+        if (cart.getCartItems().size()<1)
+            return;
+        ExecutorService executor = Executors.newFixedThreadPool(2);
+
         // 1. Αποθήκευση της παραγγελίας στην τοπική βάση
         int orderId = saveOrderLocally();
 
         if (orderId > 0) {
             // 2. Εκτύπωση της παραγγελίας
-            printOrder(orderId);
+            executor.execute(() -> printOrder(orderId));
             boolean printSuccess = true;
 
             if (printSuccess) {
                 // 3. Εμφάνιση επιβεβαίωσης και καθαρισμός καλαθιού
                 Toast.makeText(this, "Η παραγγελία αποθηκεύτηκε και εκτυπώθηκε.", Toast.LENGTH_SHORT).show();
-                cart.getInstance(tableNumber).clearCart();
+                cart.getInstance(tableid).clearCart();
                 cartAdapter.notifyDataSetChanged();
-
                 // 4. Εκκίνηση συγχρονισμού με τον server
-                syncOrderWithServer(orderId);
+                //executor.execute(() -> syncOrderWithServer(orderId));
+
+                dbHelper.tableSetStatus(tableid,2);
+                Intent intent = new Intent(CartActivity.this, TablesActivity.class);
+                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+                startActivity(intent);
+                finish(); // Τερματίζει την CartActivity
             } else {
                 Toast.makeText(this, "Αποθήκευση έγινε, αλλά απέτυχε η εκτύπωση.", Toast.LENGTH_SHORT).show();
             }
@@ -94,7 +106,7 @@ public class CartActivity extends AppCompatActivity {
 
         // Δημιουργία της παραγγελίας
         Order order = new Order();
-        order.setTableId(tableNumber); // Αναφορά στο τραπέζι
+        order.setTableId(tableid); // Αναφορά στο τραπέζι
         order.setOrderTotal(sum); // Υπολογισμός συνόλου παραγγελίας
         order.setTimestamp(String.valueOf(System.currentTimeMillis())); // Χρόνος καταχώρησης
         order.setSynced(false); // Ορισμός ότι η παραγγελία δεν έχει συγχρονιστεί
@@ -103,7 +115,7 @@ public class CartActivity extends AppCompatActivity {
         int orderId = dbHelper.insertOrder(order);
         if (orderId > 0) { // Αν η εισαγωγή είναι επιτυχής
             // Εισαγωγή των λεπτομερειών της παραγγελίας
-            for (Product product : cart.getInstance(tableNumber).getCartItems()) {
+            for (Product product : cart.getInstance(tableid).getCartItems()) {
                 OrderDetail orderDetail = new OrderDetail();
                 orderDetail.setOrderId(orderId); // Σύνδεση με την παραγγελία
                 orderDetail.setProductId(product.getProd_id()); // ID προϊόντος

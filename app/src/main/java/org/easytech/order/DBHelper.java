@@ -16,6 +16,7 @@ public class DBHelper extends SQLiteOpenHelper {
     String TABLE_TABLES = "tables";
     String TABLE_ORDERS = "orders";
     String TABLE_ORDERDETAILS = "order_details";
+    String TABLE_PRINTQUEUE = "print_queue";
 
     public DBHelper(Context context) {
         super(context, "Orders", null, 1);
@@ -45,8 +46,9 @@ public class DBHelper extends SQLiteOpenHelper {
                 "table_id INTEGER, " +
                 "order_total REAL, " +
                 "timestamp TEXT, " +
-                "is_synced  INTEGER DEFAULT 0, " +
-                "is_printed INTEGER DEFAULT 0)");
+                "print_status INTEGER DEFAULT 0, " +
+                "is_ontable  INTEGER DEFAULT 1,"+
+                "is_synced  INTEGER DEFAULT 0)");
 
         db.execSQL("CREATE TABLE IF NOT EXISTS " + TABLE_ORDERDETAILS + "(" +
                 "detail_id INTEGER PRIMARY KEY AUTOINCREMENT, " +
@@ -213,7 +215,7 @@ public class DBHelper extends SQLiteOpenHelper {
                 order.setTableId(cursor.getInt(cursor.getColumnIndex("table_id")));
                 order.setOrderTotal(cursor.getDouble(cursor.getColumnIndex("order_total")));
                 order.setTimestamp(cursor.getString(cursor.getColumnIndex("timestamp")));
-                order.setPrinted(cursor.getInt(cursor.getColumnIndex("is_printed")) == 1);
+                order.setIsOnTable(cursor.getInt(cursor.getColumnIndex("is_ontable")));
                 orders.add(order);
             } while (cursor.moveToNext());
         }
@@ -355,4 +357,58 @@ public class DBHelper extends SQLiteOpenHelper {
         }
         return status;
     }
+
+    public void updatePrintStatus(int orderId, int status) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put("print_status", status);
+        db.update(TABLE_ORDERS, values, "order_id = ?", new String[]{String.valueOf(orderId)});
+    }
+
+    public List<Order> getPendingPrintOrders() {
+        List<Order> orders = new ArrayList<>();
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = db.query("Orders", null, "print_status = 0", null, null, null, null);
+
+        while (cursor.moveToNext()) {
+            int id = cursor.getInt(cursor.getColumnIndexOrThrow("order_id"));
+            int tableId = cursor.getInt(cursor.getColumnIndexOrThrow("table_id"));
+            double orderTotal = cursor.getDouble(cursor.getColumnIndexOrThrow("order_total"));
+            String timestamp = cursor.getString(cursor.getColumnIndexOrThrow("timestamp"));
+            orders.add(new Order(id, tableId, orderTotal, timestamp, 0)); // Δημιουργία αντικειμένου Order
+        }
+        cursor.close();
+        return orders;
+    }
+
+    @SuppressLint("Range")
+    public List<Product> getUnprintedOrderItems(int orderId) {
+        List<Product> productList = new ArrayList<>();
+        SQLiteDatabase db = this.getReadableDatabase();
+
+        String query = "SELECT p.prod_id, p.prod_name, od.quantity, od.price " +
+                "FROM order_details od " +
+                "JOIN products p ON od.product_id = p.prod_id " +
+                "JOIN orders o ON od.order_id = o.order_id " +
+                "WHERE o.print_status = 0 AND o.order_id = ?";
+
+        Cursor cursor = db.rawQuery(query, new String[]{String.valueOf(orderId)});
+
+        if (cursor != null) {
+            while (cursor.moveToNext()) {
+               int prodId = cursor.getInt(cursor.getColumnIndex("prod_id"));
+                String prodName = cursor.getString(cursor.getColumnIndex("prod_name"));
+                int quantity = cursor.getInt(cursor.getColumnIndex("quantity"));
+                double price = cursor.getDouble(cursor.getColumnIndex("price"));
+
+                Product product = new Product(prodId, prodName, price, quantity);
+                productList.add(product);
+            }
+            cursor.close();
+        }
+
+        return productList;
+    }
+
+
 }

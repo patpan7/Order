@@ -11,6 +11,14 @@ public class Product implements Parcelable {
     private int prod_status;
     private int quantity;
 
+    public Product(int prod_id, String prod_name, double prod_price, int prod_cat) {
+        this.prod_id = prod_id;
+        this.prod_name = prod_name;
+        this.prod_price = prod_price;
+        this.prod_cat = prod_cat;
+        this.quantity = 0;
+    }
+
     public Product(int prod_id, String prod_name, double prod_price, int prod_cat, int prod_status) {
         this.prod_id = prod_id;
         this.prod_name = prod_name;

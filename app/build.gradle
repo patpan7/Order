@@ -4,12 +4,12 @@ plugins {
 
 android {
     namespace 'org.easytech.order'
-    compileSdk 34
+    compileSdk 35
 
     defaultConfig {
         applicationId "org.easytech.order"
         minSdk 24
-        targetSdk 34
+        targetSdk 35
         versionCode 1
         versionName "1.0"
 
@@ -40,4 +40,6 @@ dependencies {
     androidTestImplementation libs.espresso.core
     implementation libs.jtds
     implementation libs.escpos.thermalprinter.android
+    implementation libs.gson
+    implementation libs.work.runtime
 }

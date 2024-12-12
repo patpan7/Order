@@ -21,6 +21,7 @@ public class MainActivity extends AppCompatActivity {
 
         cardTables = findViewById(R.id.cardTables);
         cardSettings = findViewById(R.id.cardSettings);
+        WorkerManager.scheduleAppWorker(this);
 
         cardTables.setOnClickListener(view -> {
             Intent intent = new Intent(MainActivity.this, TablesActivity.class);

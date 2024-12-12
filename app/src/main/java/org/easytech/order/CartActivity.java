@@ -69,38 +69,35 @@ public class CartActivity extends AppCompatActivity {
 
     // Μέθοδος για την αποστολή της παραγγελίας στον εκτυπωτή
     private void handleSaveAndPrint() {
-        if (cart.getCartItems().size()<1)
+        if (cart.getCartItems().size() < 1) {
+            Toast.makeText(this, "Το καλάθι είναι άδειο.", Toast.LENGTH_SHORT).show();
             return;
-        ExecutorService executor = Executors.newFixedThreadPool(2);
+        }
 
-        // 1. Αποθήκευση της παραγγελίας στην τοπική βάση
+        // Αποθήκευση της παραγγελίας στην τοπική βάση
         int orderId = saveOrderLocally();
 
         if (orderId > 0) {
-            // 2. Εκτύπωση της παραγγελίας
-            executor.execute(() -> printOrder(orderId));
-            boolean printSuccess = true;
+            Toast.makeText(this, "Η παραγγελία αποθηκεύτηκε και προστέθηκε στην ουρά εκτύπωσης.", Toast.LENGTH_SHORT).show();
 
-            if (printSuccess) {
-                // 3. Εμφάνιση επιβεβαίωσης και καθαρισμός καλαθιού
-                Toast.makeText(this, "Η παραγγελία αποθηκεύτηκε και εκτυπώθηκε.", Toast.LENGTH_SHORT).show();
-                cart.getInstance(tableid).clearCart();
-                cartAdapter.notifyDataSetChanged();
-                // 4. Εκκίνηση συγχρονισμού με τον server
-                //executor.execute(() -> syncOrderWithServer(orderId));
+            // Καθαρισμός του καλαθιού
+            cart.getInstance(tableid).clearCart();
+            cartAdapter.notifyDataSetChanged();
 
-                dbHelper.tableSetStatus(tableid,2);
-                Intent intent = new Intent(CartActivity.this, TablesActivity.class);
-                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
-                startActivity(intent);
-                finish(); // Τερματίζει την CartActivity
-            } else {
-                Toast.makeText(this, "Αποθήκευση έγινε, αλλά απέτυχε η εκτύπωση.", Toast.LENGTH_SHORT).show();
-            }
+            // Ενημέρωση κατάστασης τραπεζιού
+            dbHelper.tableSetStatus(tableid, 2);
+
+            // Επιστροφή στην οθόνη τραπεζιών
+            Intent intent = new Intent(CartActivity.this, TablesActivity.class);
+            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+            startActivity(intent);
+            finish();
         } else {
             Toast.makeText(this, "Αποτυχία αποθήκευσης της παραγγελίας.", Toast.LENGTH_SHORT).show();
         }
     }
+
+
     private int saveOrderLocally() {
         DBHelper dbHelper = new DBHelper(this); // Αρχικοποίηση του DBHelper
 
@@ -109,7 +106,8 @@ public class CartActivity extends AppCompatActivity {
         order.setTableId(tableid); // Αναφορά στο τραπέζι
         order.setOrderTotal(sum); // Υπολογισμός συνόλου παραγγελίας
         order.setTimestamp(String.valueOf(System.currentTimeMillis())); // Χρόνος καταχώρησης
-        order.setSynced(false); // Ορισμός ότι η παραγγελία δεν έχει συγχρονιστεί
+        order.setSynced(0); // Ορισμός ότι η παραγγελία δεν έχει συγχρονιστεί
+        order.setPrintStatus(0); // Εκκρεμής εκτύπωση
 
         // Εισαγωγή της παραγγελίας στον πίνακα Orders
         int orderId = dbHelper.insertOrder(order);
@@ -128,24 +126,23 @@ public class CartActivity extends AppCompatActivity {
     }
 
     private void printOrder(int orderId) {
-        String printerIp = "192.168.1.97";
-        int printerPort = 9100;
-
-        EscPosPrinterHelper printerHelper = new EscPosPrinterHelper(printerIp, printerPort);
+        EscPosPrinterHelper printerHelper = new EscPosPrinterHelper();
 
         printerHelper.printOrderAsync(orderId, cart.getCartItems(), new EscPosPrinterHelper.PrintCallback() {
             @Override
             public void onSuccess() {
-                runOnUiThread(() ->
-                        Toast.makeText(getApplicationContext(), "Η εκτύπωση ολοκληρώθηκε!", Toast.LENGTH_SHORT).show()
-                );
+                runOnUiThread(() ->{
+                    Toast.makeText(getApplicationContext(), "Η εκτύπωση ολοκληρώθηκε!", Toast.LENGTH_SHORT).show();
+                    DBHelper dbHelper = new DBHelper(getApplicationContext());
+                    dbHelper.updatePrintStatus(orderId, 1); // Ενημέρωση για επιτυχημένη εκτύπωση
+                });
             }
 
             @Override
             public void onError(Exception e) {
-                runOnUiThread(() ->
-                        Toast.makeText(getApplicationContext(), "Σφάλμα στην εκτύπωση: " + e.getMessage(), Toast.LENGTH_SHORT).show()
-                );
+                runOnUiThread(() -> {
+                    Toast.makeText(getApplicationContext(), "Σφάλμα στην εκτύπωση: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                });
             }
         });
     }

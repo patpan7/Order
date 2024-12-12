@@ -13,6 +13,12 @@
         android:textSize="18sp"
         android:textStyle="bold"
         android:layout_marginBottom="10dp"/>
+    <Button
+        android:id="@+id/viewOrderButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Προβολή Παραγγελίας"
+        android:layout_marginBottom="10dp"/>
 
     <Button
         android:id="@+id/newOrderButton"

@@ -10,8 +10,8 @@ import java.util.List;
 
 public class EscPosPrinterHelper {
 
-    private String printerIpAddress;
-    private int printerPort;
+    private String printerIpAddress = "192.168.1.97";
+    private int printerPort = 9100;
     private EscPosPrinter printer;
     private TcpConnection tcpConnection;
 
@@ -22,9 +22,7 @@ public class EscPosPrinterHelper {
     }
 
     // Κατασκευαστής: Αποθηκεύει τα στοιχεία του εκτυπωτή
-    public EscPosPrinterHelper(String printerIpAddress, int printerPort) {
-        this.printerIpAddress = printerIpAddress;
-        this.printerPort = printerPort;
+    public EscPosPrinterHelper() {
     }
 
     // Ασύγχρονη μέθοδος για τη σύνδεση με τον εκτυπωτή
@@ -36,7 +34,7 @@ public class EscPosPrinterHelper {
                     tcpConnection.disconnect();
                 }
 
-                tcpConnection = new TcpConnection(printerIpAddress, printerPort);
+                tcpConnection = new TcpConnection(printerIpAddress, printerPort,3600);
                 tcpConnection.connect();
                 printer = new EscPosPrinter(tcpConnection, 203, 72, 48, new EscPosCharsetEncoding("Cp737", 64)); // 203 DPI, 48 χαρακτήρες ανά γραμμή
                 onSuccess.run();

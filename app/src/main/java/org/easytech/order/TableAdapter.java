@@ -3,6 +3,7 @@ package org.easytech.order;
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Color;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -13,6 +14,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.List;
@@ -101,8 +103,13 @@ public class TableAdapter extends RecyclerView.Adapter<TableAdapter.TableViewHol
         builder.setView(popupView);
 
         // Βρες τα κουμπιά και ορίστε τους listeners τους
+        Button viewOrderButton = popupView.findViewById(R.id.viewOrderButton);
         Button newOrderButton = popupView.findViewById(R.id.newOrderButton);
         Button checkoutButton = popupView.findViewById(R.id.checkoutButton);
+
+        viewOrderButton.setOnClickListener(v -> {
+            showOrders(position);
+        });
 
         newOrderButton.setOnClickListener(v -> {
             startNewOrderActivity(position);
@@ -117,6 +124,10 @@ public class TableAdapter extends RecyclerView.Adapter<TableAdapter.TableViewHol
         dialog.show();
     }
 
+    private void showOrders(int position) {
+
+    }
+
     private void startNewOrderActivity(int position) {
         listener.onTableClick(position);
     }
@@ -125,6 +136,7 @@ public class TableAdapter extends RecyclerView.Adapter<TableAdapter.TableViewHol
         dbHelper = new DBHelper(context);
         int table_id = tableList.get(position).getTable_id();
         boolean success = dbHelper.tableSetStatus(table_id, 1); // Επιστροφή στο status 1 (διαθέσιμο)
+        dbHelper.orderSetStatus(table_id,0);
         if (success) {
             Toast.makeText(context, "Το τραπέζι εξοφλήθηκε!", Toast.LENGTH_SHORT).show();
 

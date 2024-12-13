@@ -2,6 +2,7 @@ package org.easytech.order;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -100,7 +101,6 @@ public class CartActivity extends AppCompatActivity {
 
     private int saveOrderLocally() {
         DBHelper dbHelper = new DBHelper(this); // Αρχικοποίηση του DBHelper
-
         // Δημιουργία της παραγγελίας
         Order order = new Order();
         order.setTableId(tableid); // Αναφορά στο τραπέζι
@@ -118,6 +118,7 @@ public class CartActivity extends AppCompatActivity {
                 orderDetail.setOrderId(orderId); // Σύνδεση με την παραγγελία
                 orderDetail.setProductId(product.getProd_id()); // ID προϊόντος
                 orderDetail.setQuantity(product.getQuantity()); // Ποσότητα προϊόντος
+                Log.e("Quantity", String.valueOf(product.getQuantity()));
                 orderDetail.setPrice(product.getProd_price()); // Τιμή προϊόντος
                 dbHelper.insertOrderDetail(orderDetail); // Εισαγωγή στον πίνακα OrderDetails
             }
@@ -126,25 +127,25 @@ public class CartActivity extends AppCompatActivity {
     }
 
     private void printOrder(int orderId) {
-        EscPosPrinterHelper printerHelper = new EscPosPrinterHelper();
-
-        printerHelper.printOrderAsync(orderId, cart.getCartItems(), new EscPosPrinterHelper.PrintCallback() {
-            @Override
-            public void onSuccess() {
-                runOnUiThread(() ->{
-                    Toast.makeText(getApplicationContext(), "Η εκτύπωση ολοκληρώθηκε!", Toast.LENGTH_SHORT).show();
-                    DBHelper dbHelper = new DBHelper(getApplicationContext());
-                    dbHelper.updatePrintStatus(orderId, 1); // Ενημέρωση για επιτυχημένη εκτύπωση
-                });
-            }
-
-            @Override
-            public void onError(Exception e) {
-                runOnUiThread(() -> {
-                    Toast.makeText(getApplicationContext(), "Σφάλμα στην εκτύπωση: " + e.getMessage(), Toast.LENGTH_SHORT).show();
-                });
-            }
-        });
+//        EscPosPrinterHelper printerHelper = new EscPosPrinterHelper();
+//
+//        printerHelper.printOrderAsync(orderId, cart.getCartItems(), new EscPosPrinterHelper.PrintCallback() {
+//            @Override
+//            public void onSuccess() {
+//                runOnUiThread(() ->{
+//                    Toast.makeText(getApplicationContext(), "Η εκτύπωση ολοκληρώθηκε!", Toast.LENGTH_SHORT).show();
+//                    DBHelper dbHelper = new DBHelper(getApplicationContext());
+//                    dbHelper.updatePrintStatus(orderId, 1); // Ενημέρωση για επιτυχημένη εκτύπωση
+//                });
+//            }
+//
+//            @Override
+//            public void onError(Exception e) {
+//                runOnUiThread(() -> {
+//                    Toast.makeText(getApplicationContext(), "Σφάλμα στην εκτύπωση: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+//                });
+//            }
+//        });
     }
 
 

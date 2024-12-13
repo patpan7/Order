@@ -46,13 +46,14 @@ public class EscPosPrinterHelper {
     }
 
     // Ασύγχρονη μέθοδος για την εκτύπωση παραγγελίας
-    public void printOrderAsync(int orderId, List<Product> cartItems, PrintCallback callback) {
+    public void printOrderAsync(int orderId, List<Product> cartItems, String tableName, PrintCallback callback) {
         connectPrinterAsync(() -> {
             try {
                 // Δημιουργία του κειμένου της απόδειξης
                 StringBuilder receipt = new StringBuilder();
                 receipt.append("[C]<font size='big'><b>Παραγγελία #").append(orderId).append("</b></font>\n");
-                receipt.append("-------------------------------\n");
+                receipt.append("[C]<font size='big'>").append(tableName).append("</font>");
+                receipt.append("------------------------------------------------\n");
                 Log.e("cartitems", cartItems.size()+"");
                 for (Product product : cartItems) {
                     receipt.append(product.getProd_name())
@@ -63,7 +64,7 @@ public class EscPosPrinterHelper {
                             .append("€\n");
                 }
 
-                receipt.append("-------------------------------\n");
+                receipt.append("------------------------------------------------\n");
 
                 // Υπολογισμός συνολικού ποσού
                 double total = 0;

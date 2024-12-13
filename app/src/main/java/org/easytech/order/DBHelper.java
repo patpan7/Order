@@ -346,17 +346,6 @@ public class DBHelper extends SQLiteOpenHelper {
         return rowsAffected > 0;
     }
 
-    @SuppressLint("Range")
-    public int tableGetStatus(int tableId) {
-        int status = 0;
-        SQLiteDatabase db = this.getReadableDatabase();
-        String query = "SELECT status FROM " + TABLE_TABLES + " WHERE table_id = ?";
-        Cursor cursor = db.rawQuery(query, new String[]{String.valueOf(tableId)});
-        if (cursor.moveToFirst()) {
-            status = cursor.getInt(cursor.getColumnIndex("status"));
-        }
-        return status;
-    }
 
     public void updatePrintStatus(int orderId, int status) {
         SQLiteDatabase db = this.getWritableDatabase();
@@ -411,4 +400,30 @@ public class DBHelper extends SQLiteOpenHelper {
     }
 
 
+    public void orderSetStatus(int tableId, int status) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put("is_ontable", status);
+        db.update(TABLE_ORDERS, values, "table_id = ?", new String[]{String.valueOf(tableId)});
+    }
+
+    @SuppressLint("Range")
+    public String getTableName(int orderId) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        String tableName = null;
+
+        // Κάνουμε JOIN στον πίνακα orders με τον πίνακα tables για να πάρουμε το table_name
+        String query = "SELECT t.table_name FROM "+TABLE_TABLES+" t " +
+                "JOIN "+TABLE_ORDERS+" o ON t.table_id = o.table_id " +
+                "WHERE o.order_id = ?";
+
+        Cursor cursor = db.rawQuery(query, new String[]{String.valueOf(orderId)});
+
+        if (cursor != null && cursor.moveToFirst()) {
+            tableName = cursor.getString(cursor.getColumnIndex("table_name"));
+            cursor.close();
+        }
+
+        return tableName; // Επιστρέφει το όνομα του τραπεζιού ή null αν δεν βρεθεί η παραγγελία
+    }
 }

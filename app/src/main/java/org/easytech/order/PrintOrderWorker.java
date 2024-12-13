@@ -57,8 +57,9 @@ public class PrintOrderWorker extends Worker {
     private void printOrder(int orderId) {
         DBHelper dbHelper = new DBHelper(getApplicationContext());
         EscPosPrinterHelper printerHelper = new EscPosPrinterHelper();
+        String tableName = dbHelper.getTableName(orderId);
         List<Product> orderItems = dbHelper.getUnprintedOrderItems(orderId);
-        printerHelper.printOrderAsync(orderId, orderItems, new EscPosPrinterHelper.PrintCallback() {
+        printerHelper.printOrderAsync(orderId, orderItems,tableName, new EscPosPrinterHelper.PrintCallback() {
             @Override
             public void onSuccess() {
                 //Toast.makeText(getApplicationContext(), "Η εκτύπωση ολοκληρώθηκε!", Toast.LENGTH_SHORT).show();

@@ -1,5 +1,7 @@
 package org.easytech.order;
 
+import static androidx.core.content.ContextCompat.startActivity;
+
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
@@ -32,11 +34,9 @@ public class CartActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_cart);
         dbHelper = new DBHelper(this);
-        /// Ανάκτηση του καλαθιού από το Intent
-        cart = getIntent().getParcelableExtra("cart");
 
         tableid = getIntent().getIntExtra("tableid", -1);
-
+        cart = Cart.getInstance(tableid);
         // Εδώ αρχικοποιούμε το cart εάν δεν έχει ήδη περαστεί
         if (cart == null) {
             cart = new Cart();  // Δημιουργία νέου cart αντικειμένου

@@ -1,5 +1,7 @@
 package org.easytech.order;
 
+import static androidx.core.content.ContextCompat.startActivity;
+
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.content.Context;
@@ -125,7 +127,10 @@ public class TableAdapter extends RecyclerView.Adapter<TableAdapter.TableViewHol
     }
 
     private void showOrders(int position) {
-
+        int tableId = tableList.get(position).getTable_id();
+        Intent intent = new Intent(context, OrderDetailsActivity.class);
+        intent.putExtra("table_id", tableId);
+        context.startActivity(intent);
     }
 
     private void startNewOrderActivity(int position) {

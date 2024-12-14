@@ -426,4 +426,45 @@ public class DBHelper extends SQLiteOpenHelper {
 
         return tableName; // Επιστρέφει το όνομα του τραπεζιού ή null αν δεν βρεθεί η παραγγελία
     }
+
+    public List<Order> getOrdersForTable(int tableId) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        List<Order> orders = new ArrayList<>();
+        String query = "SELECT * FROM " + TABLE_ORDERS + " WHERE table_id = ? AND is_ontable = 1";
+
+        Cursor cursor = db.rawQuery(query, new String[]{String.valueOf(tableId)});
+        while (cursor.moveToNext()) {
+            int id = cursor.getInt(cursor.getColumnIndexOrThrow("order_id"));
+            double orderTotal = cursor.getDouble(cursor.getColumnIndexOrThrow("order_total"));
+            String timestamp = cursor.getString(cursor.getColumnIndexOrThrow("timestamp"));
+            orders.add(new Order(id, tableId, orderTotal, timestamp, false));
+        }
+        return orders;
+    }
+
+    public List<Product> getOrderItems(int orderId) {
+        List<Product> orderItems = new ArrayList<>();
+        SQLiteDatabase db = this.getReadableDatabase();
+
+        String query = "SELECT od.detail_id, p.prod_name, p.prod_price, od.quantity, od.price " +
+                "FROM " + TABLE_ORDERDETAILS + " od " +
+                "JOIN " + TABLE_PRODUCTS + " p ON od.product_id = p.prod_id " +
+                "WHERE od.order_id = ?";
+
+        Cursor cursor = db.rawQuery(query, new String[]{String.valueOf(orderId)});
+        if (cursor != null) {
+            while (cursor.moveToNext()) {
+                int detailId = cursor.getInt(cursor.getColumnIndexOrThrow("detail_id"));
+                String productName = cursor.getString(cursor.getColumnIndexOrThrow("prod_name"));
+                double productPrice = cursor.getDouble(cursor.getColumnIndexOrThrow("prod_price"));
+                int quantity = cursor.getInt(cursor.getColumnIndexOrThrow("quantity"));
+                double price = cursor.getDouble(cursor.getColumnIndexOrThrow("price"));
+
+                Product item = new Product(detailId, productName, productPrice, quantity, price);
+                orderItems.add(item);
+            }
+            cursor.close();
+        }
+        return orderItems;
+    }
 }

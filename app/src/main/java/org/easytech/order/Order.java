@@ -8,6 +8,7 @@ public class Order {
     private int isSynced;
     private int isOnTable;
     private int printStatus;
+    private boolean isExpanded;
 
     public Order(int order_id, int table_id, double order_total, String timestamp, int printStatus) {
         this.order_id = order_id;
@@ -16,7 +17,16 @@ public class Order {
         this.timestamp = timestamp;
         this.printStatus = printStatus;
     }
+
     public Order() {
+    }
+
+    public Order(int order_id, int table_id, double order_total, String timestamp, boolean isExpanded) {
+        this.order_id = order_id;
+        this.table_id = table_id;
+        this.order_total = order_total;
+        this.timestamp = timestamp;
+        this.isExpanded = isExpanded;
     }
 
     // Getters and Setters
@@ -66,6 +76,14 @@ public class Order {
 
     public void setIsOnTable(int isOnTable) {
         this.isOnTable = isOnTable;
+    }
+
+    public boolean isExpanded() {
+        return isExpanded;
+    }
+
+    public void setExpanded(boolean expanded) {
+        isExpanded = expanded;
     }
 
     // Optional: toString για debugging

@@ -33,6 +33,7 @@
 
         <activity android:name=".TablesActivity" />
         <activity android:name=".SettingsActivity" />
+        <activity android:name=".OrderDetailsActivity" />
     </application>
 
 </manifest>

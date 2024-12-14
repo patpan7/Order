@@ -78,13 +78,15 @@ public class ProductsActivity extends AppCompatActivity implements ProductAdapte
     // Μέθοδος για να ανοίξουμε το καλάθι
     private void openCart() {
         Intent intent = new Intent(ProductsActivity.this, CartActivity.class);
-        intent.putExtra("cart", cart);  // Περάστε το καλάθι στην επόμενη δραστηριότητα
+        //intent.putExtra("cart", cart);  // Περάστε το καλάθι στην επόμενη δραστηριότητα
         intent.putExtra("tableid", tableid); // Προσθέστε το αριθμό του τραπέζιου στο intent
         startActivity(intent);
     }
 
     @Override
     public void onCartUpdated() {
-        
+        updateCartSummary(); // Ενημέρωση UI για το συνολικό κόστος
+        adapter.notifyDataSetChanged(); // Ενημέρωση του adapter
     }
+
 }

@@ -1,5 +1,6 @@
 package org.easytech.order;
 
+import android.annotation.SuppressLint;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -30,6 +31,7 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.CartViewHolder
     }
 
     // Σύνδεση των δεδομένων στο ViewHolder
+    @SuppressLint("NotifyDataSetChanged")
     @Override
     public void onBindViewHolder(CartViewHolder holder, int position) {
         Product product = cartItems.get(position);

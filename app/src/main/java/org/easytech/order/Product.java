@@ -10,6 +10,7 @@ public class Product implements Parcelable {
     private int prod_cat;
     private int prod_status;
     private int quantity;
+    private double total_price;
 
     public Product(int prod_id, String prod_name, double prod_price, int quantity) {
         this.prod_id = prod_id;
@@ -25,6 +26,15 @@ public class Product implements Parcelable {
         this.prod_cat = prod_cat;
         this.prod_status = prod_status;
         this.quantity = 0;
+    }
+
+    public Product(int detailId, String productName, double productPrice, int quantity, double total_price) {
+        this.prod_id = detailId;
+        this.prod_name = productName;
+        this.prod_price = productPrice;
+        this.quantity = quantity;
+        this.total_price = total_price;
+
     }
 
     public int getProd_id() {
@@ -73,6 +83,14 @@ public class Product implements Parcelable {
 
     public void setQuantity(int quantity) {
         this.quantity = quantity;
+    }
+
+    public double getTotal_price() {
+        return total_price;
+    }
+
+    public void setTotal_price(double total_price) {
+        this.total_price = total_price;
     }
 
     // Parcelable implementation

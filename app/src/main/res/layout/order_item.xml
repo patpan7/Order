@@ -29,4 +29,12 @@
         android:layout_marginTop="8dp"
         android:visibility="gone"
         android:text="Είδη παραγγελίας"/>
+
+    <Button
+        android:id="@+id/btnReprint"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Επανεκτύπωση"
+        android:visibility="gone"
+        android:layout_marginTop="8dp" />
 </LinearLayout>

@@ -39,6 +39,7 @@ public class TableAdapter extends RecyclerView.Adapter<TableAdapter.TableViewHol
         this.tableList = tableList;
         this.listener = listener;
         this.context = context;
+        this.dbHelper = new DBHelper(context);
     }
 
     @NonNull
@@ -138,29 +139,41 @@ public class TableAdapter extends RecyclerView.Adapter<TableAdapter.TableViewHol
     }
 
     private void handleTableCheckout(int position) {
-        dbHelper = new DBHelper(context);
-        int table_id = tableList.get(position).getTable_id();
-        boolean success = dbHelper.tableSetStatus(table_id, 1); // Επιστροφή στο status 1 (διαθέσιμο)
-        dbHelper.orderSetStatus(table_id,0);
-        if (success) {
-            Toast.makeText(context, "Το τραπέζι εξοφλήθηκε!", Toast.LENGTH_SHORT).show();
-
-            if (dialog != null && dialog.isShowing()) {
-                dialog.dismiss();
-            }
-
-            // Ανανέωση λίστας
-            if (context instanceof TablesActivity) {
-                ((TablesActivity) context).refreshTableList();
-            }
-
-            // Εκτύπωση λίστας για έλεγχο
-            for (Table table : tableList) {
-                Log.e("Table Status", table.print());
-            }
-        } else {
-            Toast.makeText(context, "Αποτυχία εξόφλησης.", Toast.LENGTH_SHORT).show();
+        Intent intent = new Intent(context, PaymentActivity.class);
+        intent.putExtra("tableid", tableList.get(position).getTable_id());
+        context.startActivity(intent);
+        // Κλείσιμο του popup
+        if (dialog != null && dialog.isShowing()) {
+            dialog.dismiss();
         }
+
+        // Ενημέρωση του TablesActivity μέσω του context
+        if (context instanceof TablesActivity) {
+            ((TablesActivity) context).refreshTableList();
+        }
+//        dbHelper = new DBHelper(context);
+//        int table_id = tableList.get(position).getTable_id();
+//        boolean success = dbHelper.tableSetStatus(table_id, 1); // Επιστροφή στο status 1 (διαθέσιμο)
+//        dbHelper.orderSetStatus(table_id,0);
+//        if (success) {
+//            Toast.makeText(context, "Το τραπέζι εξοφλήθηκε!", Toast.LENGTH_SHORT).show();
+//
+//            if (dialog != null && dialog.isShowing()) {
+//                dialog.dismiss();
+//            }
+//
+//            // Ανανέωση λίστας
+//            if (context instanceof TablesActivity) {
+//                ((TablesActivity) context).refreshTableList();
+//            }
+//
+//            // Εκτύπωση λίστας για έλεγχο
+//            for (Table table : tableList) {
+//                Log.e("Table Status", table.print());
+//            }
+//        } else {
+//            Toast.makeText(context, "Αποτυχία εξόφλησης.", Toast.LENGTH_SHORT).show();
+//        }
     }
 
 

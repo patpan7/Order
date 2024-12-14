@@ -57,4 +57,11 @@ public class TablesActivity extends AppCompatActivity implements TableAdapter.On
         adapter.updateTableList(tableList);
         adapter.notifyDataSetChanged();
     }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        refreshTableList(); // Ενημέρωση δεδομένων
+    }
+
 }

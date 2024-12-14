@@ -46,6 +46,7 @@ public class DBHelper extends SQLiteOpenHelper {
                 "table_id INTEGER, " +
                 "order_total REAL, " +
                 "timestamp TEXT, " +
+                "payment_type TEXT DEFAULT '' ,"+
                 "print_status INTEGER DEFAULT 0, " +
                 "is_ontable  INTEGER DEFAULT 1,"+
                 "is_synced  INTEGER DEFAULT 0)");
@@ -466,5 +467,33 @@ public class DBHelper extends SQLiteOpenHelper {
             cursor.close();
         }
         return orderItems;
+    }
+
+    public List<String> getPaymentMethods() {
+        List<String> paymentMethods = new ArrayList<>();
+//        SQLiteDatabase db = this.getReadableDatabase();
+//        Cursor cursor = db.rawQuery("SELECT method_name FROM payment_methods", null);
+//
+//        if (cursor != null) {
+//            while (cursor.moveToNext()) {
+//                paymentMethods.add(cursor.getString(cursor.getColumnIndexOrThrow("method_name")));
+//            }
+//            cursor.close();
+//        }
+        paymentMethods.add("Μετρητά");
+        paymentMethods.add("Κάρτα");
+        paymentMethods.add("IRIS");
+        return paymentMethods;
+    }
+
+    public void markTableAsPaid(int tableId, String paymentType) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        db.execSQL("UPDATE orders SET payment_type = ? WHERE table_id = ?",
+                new Object[]{paymentType, tableId});
+    }
+
+    public List<Product> getProductsForTable(int tableId) {
+
+        return null;
     }
 }

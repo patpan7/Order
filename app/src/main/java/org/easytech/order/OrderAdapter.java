@@ -5,7 +5,9 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
@@ -35,6 +37,11 @@ public class OrderAdapter extends RecyclerView.Adapter<OrderAdapter.OrderViewHol
         holder.orderIdTextView.setText("Παραγγελία #" + order.getOrderId());
         holder.orderTotalTextView.setText(String.format("%.2f €", order.getOrderTotal()));
 
+        holder.btnReprint.setOnClickListener(v -> {
+            // Ενέργεια επανεκτύπωσης
+            reprintOrder(order.getOrderId(),order.getTableId());
+        });
+
         // Επεκτείνει ή κρύβει τα είδη της παραγγελίας
         holder.itemView.setOnClickListener(v -> {
             boolean expanded = order.isExpanded();
@@ -45,6 +52,7 @@ public class OrderAdapter extends RecyclerView.Adapter<OrderAdapter.OrderViewHol
         // Προβολή ειδών παραγγελίας αν είναι επεκταμένη
         if (order.isExpanded()) {
             holder.itemsTextView.setVisibility(View.VISIBLE);
+            holder.btnReprint.setVisibility(View.VISIBLE);
             DBHelper dbhelper = new DBHelper(context);
             List<Product> products = dbhelper.getOrderItems(order.getOrderId());
             Log.d("OrderAdapter", "Products for order " + order.getOrderId() + ": " + products.size());
@@ -60,6 +68,7 @@ public class OrderAdapter extends RecyclerView.Adapter<OrderAdapter.OrderViewHol
             holder.itemsTextView.setText(items.toString());
         } else {
             holder.itemsTextView.setVisibility(View.GONE);
+            holder.btnReprint.setVisibility(View.GONE);
         }
     }
 
@@ -72,12 +81,31 @@ public class OrderAdapter extends RecyclerView.Adapter<OrderAdapter.OrderViewHol
         TextView orderIdTextView;
         TextView orderTotalTextView;
         TextView itemsTextView;
+        Button btnReprint;
 
         public OrderViewHolder(@NonNull View itemView) {
             super(itemView);
             orderIdTextView = itemView.findViewById(R.id.orderId);
             orderTotalTextView = itemView.findViewById(R.id.orderTotal);
             itemsTextView = itemView.findViewById(R.id.orderItems);
+            btnReprint = itemView.findViewById(R.id.btnReprint);
         }
+    }
+    private void reprintOrder(int orderId, int tableId) {
+        EscPosPrinterHelper printerHelper = new EscPosPrinterHelper();
+        DBHelper dbHelper = new DBHelper(context);
+        String tableName = dbHelper.getTableName(tableId);
+        List<Product> orderItems = dbHelper.getOrderItems(orderId);
+        printerHelper.printOrderAsync(orderId, orderItems,tableName, new EscPosPrinterHelper.PrintCallback() {
+            @Override
+            public void onSuccess() {
+                Log.e("OrderAdapter", "Order printed successfully");
+            }
+
+            @Override
+            public void onError(Exception e) {
+                Log.e("OrderAdapter", "Error printing order: " + e.getMessage());
+            }
+        });
     }
 }

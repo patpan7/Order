@@ -16,6 +16,7 @@ public class DBHelper extends SQLiteOpenHelper {
     String TABLE_TABLES = "tables";
     String TABLE_ORDERS = "orders";
     String TABLE_ORDERDETAILS = "order_details";
+    String TABLE_USERS  = "users";
     String TABLE_PRINTQUEUE = "print_queue";
 
     public DBHelper(Context context) {
@@ -40,6 +41,12 @@ public class DBHelper extends SQLiteOpenHelper {
                 "    table_id INTEGER PRIMARY KEY,\n" +
                 "    table_name TEXT,\n" +
                 "    status INTEGER)");
+
+        db.execSQL("CREATE TABLE IF NOT EXISTS " + TABLE_USERS + "(" +
+                "   user_id INTEGER PRIMARY KEY, " +
+                "   user_name TEXT, " +
+                "   user_pass TEXT," +
+                "   is_active INTEGER DEFAULT 1)");
 
         db.execSQL("CREATE TABLE IF NOT EXISTS " + TABLE_ORDERS + " (" +
                 "order_id INTEGER PRIMARY KEY AUTOINCREMENT, " +
@@ -492,8 +499,22 @@ public class DBHelper extends SQLiteOpenHelper {
                 new Object[]{paymentType, tableId});
     }
 
-    public List<Product> getProductsForTable(int tableId) {
+    public List<Users> getUsers() {
+        List<Users> users = new ArrayList<>();
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = db.rawQuery("SELECT * FROM " + TABLE_USERS + " WHERE is_active = 1", null);
 
-        return null;
+        if (cursor.moveToFirst()) {
+            do {
+                @SuppressLint("Range") Users user = new Users(
+                        cursor.getInt(cursor.getColumnIndex("user_id")),
+                        cursor.getString(cursor.getColumnIndex("user_name")),
+                        cursor.getString(cursor.getColumnIndex("user_pass"))
+                );
+                users.add(user);
+            } while (cursor.moveToNext());
+        }
+        cursor.close();
+        return users;
     }
 }

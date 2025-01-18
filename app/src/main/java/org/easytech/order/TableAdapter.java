@@ -60,7 +60,7 @@ public class TableAdapter extends RecyclerView.Adapter<TableAdapter.TableViewHol
         if (tableList.get(position).getStatus() == 2) {
             holder.tableNumber.setBackgroundColor(Color.RED); // Χρώμα για τραπέζια με παραγγελία
         } else {
-            holder.tableNumber.setBackgroundColor(Color.GRAY); // Χρώμα για ελεύθερα τραπέζια
+            //holder.tableNumber.setBackgroundColor(Color.GRAY); // Χρώμα για ελεύθερα τραπέζια
         }
 
         // Πατώντας σε κάθε τραπέζι θα καλείται η μέθοδος του listener

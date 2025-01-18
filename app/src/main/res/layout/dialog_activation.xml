@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="16dp">
+
+    <TextView
+        android:id="@+id/tvActivationMessage"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Παρακαλώ εισάγετε τον κωδικό ενεργοποίησης για να ενημερώσετε την ημερομηνία λήξης."
+        android:textIsSelectable="true" />
+
+    <EditText
+        android:id="@+id/activationCodeEditText"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Κωδικός ενεργοποίησης"
+        android:inputType="text" />
+
+    <Button
+        android:id="@+id/activateButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Ενεργοποίηση"
+        android:layout_marginTop="16dp" />
+</LinearLayout>

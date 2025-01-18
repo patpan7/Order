@@ -6,81 +6,87 @@
     android:orientation="vertical"
     android:padding="16dp">
 
-
-    <EditText
-        android:id="@+id/tvServer"
+    <com.google.android.material.textfield.TextInputLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:ems="10"
-        android:inputType="text"
-        android:text="Server" />
+        android:layout_marginBottom="8dp"
+        android:hint="Server">
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center_horizontal"
-        android:orientation="horizontal">
-
-        <TextView
-            android:id="@+id/textTableCols"
-            android:layout_width="wrap_content"
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/tvServer"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:gravity="clip_vertical"
-            android:text="Στήλες Τραπεζιών" />
+            android:inputType="text" />
+    </com.google.android.material.textfield.TextInputLayout>
 
-        <EditText
+    <com.google.android.material.textfield.TextInputLayout
+        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
+        android:id="@+id/printerSpinner1"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
+        android:hint="Εκτυπωτής">
+
+        <AutoCompleteTextView
+            android:id="@+id/printerSpinner"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:editable="false"/>
+
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/textPrinterIP1"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/textPrinterIP"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="IP Εκυπωτή"
+            android:inputType="text" />
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <com.google.android.material.textfield.TextInputLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
+        android:hint="Στήλες Τραπεζιών">
+
+        <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/textTablesCol"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_weight="2"
-            android:ems="10"
             android:inputType="number" />
-    </LinearLayout>
-    <LinearLayout
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <com.google.android.material.textfield.TextInputLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_gravity="center_horizontal"
-        android:orientation="horizontal">
+        android:layout_marginBottom="8dp"
+        android:hint="Στήλες Κατηγοριών">
 
-        <TextView
-            android:id="@+id/textCategoriesCols"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:gravity="clip_vertical"
-            android:text="Στήλες Κατηγοριών" />
-
-        <EditText
+        <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/textCategoriesCol"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_weight="2"
-            android:ems="10"
             android:inputType="number" />
-    </LinearLayout>
-    <LinearLayout
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <com.google.android.material.textfield.TextInputLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_gravity="center_horizontal"
-        android:orientation="horizontal">
+        android:layout_marginBottom="8dp"
+        android:hint="Στήλες Ειδών">
 
-        <TextView
-            android:id="@+id/textProductsCols"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:gravity="clip_vertical"
-            android:text="Στήλες Ειδών" />
-
-        <EditText
+        <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/textProductsCol"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_weight="2"
-            android:ems="10"
             android:inputType="number" />
-    </LinearLayout>
+    </com.google.android.material.textfield.TextInputLayout>
 
     <Button
         android:id="@+id/btnSave"
@@ -94,7 +100,14 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="50dp"
-        android:text="Sync" />
+        android:text="Ενημέρωση από Server" />
+
+    <Button
+        android:id="@+id/btnSync2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="50dp"
+        android:text="Αποστολή παραγγελιών σε Server" />
 
     <ProgressBar
         android:id="@+id/progressBar"

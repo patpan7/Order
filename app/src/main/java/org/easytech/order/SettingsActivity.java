@@ -5,27 +5,39 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.InflateException;
+import android.view.MotionEvent;
 import android.view.View;
+import android.widget.ArrayAdapter;
+import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
+
+import com.google.android.material.textfield.TextInputLayout;
+
 import java.sql.Connection;
+import java.util.ArrayList;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 public class SettingsActivity extends AppCompatActivity {
-    Button btnSync, btnSave;
+    Button btnSync, btnSync2, btnSave;
     Connection con;
     String str;
     ProgressBar progressBar; // Ορισμός μεταβλητής για το ProgressBar
     EditText tvServer;
+    private AutoCompleteTextView printerSpinner;
+    TextInputLayout textPrinterIP1;
+    EditText textPrinterIP;
     EditText textTablesCol, textCategoriesCol, textProductsCol;
     private SharedPreferences sharedPreferences;
     private static final String PREFS_NAME = "AppPreferences";
     private static final String SERVER_KEY = "server_address";
+    private static final String PRINTER_TYPE_KEY = "printer_type";
+    private static final String PRINTER_IP_KEY = "printer_ip";
     private static final String TABLE_COL = "tables_col";
     private static final String CATEGORY_COL = "categories_col";
     private static final String PRODUCT_COL = "products_col";
@@ -35,22 +47,74 @@ public class SettingsActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_settings);
-        tvServer = findViewById(R.id.tvServer);
-        btnSave = findViewById(R.id.btnSave);
-        btnSync = findViewById(R.id.btnSync);
-        progressBar = findViewById(R.id.progressBar); // Αρχικοποίηση του ProgressBar
 
+        initializeViews();
+        setupPrinterSpinner();
+        loadSettings();
+
+        btnSave.setOnClickListener(v -> saveSettings());
+        btnSync.setOnClickListener(v -> syncData());
+        btnSync2.setOnClickListener(v -> uploadData());
+    }
+
+    private void initializeViews() {
+        tvServer = findViewById(R.id.tvServer);
+        printerSpinner = findViewById(R.id.printerSpinner);
+        textPrinterIP = findViewById(R.id.textPrinterIP);
+        textPrinterIP1 = findViewById(R.id.textPrinterIP1);
         textTablesCol = findViewById(R.id.textTablesCol);
         textCategoriesCol = findViewById(R.id.textCategoriesCol);
         textProductsCol = findViewById(R.id.textProductsCol);
+        btnSave = findViewById(R.id.btnSave);
+        btnSync = findViewById(R.id.btnSync);
+        btnSync2 = findViewById(R.id.btnSync2);
+        progressBar = findViewById(R.id.progressBar);
+    }
 
-        loadSettings();
+    @SuppressLint("ClickableViewAccessibility")
+    private void setupPrinterSpinner() {
+        printerSpinner.setOnTouchListener((v, event) -> {
+            if (event.getAction() == MotionEvent.ACTION_DOWN) {
+                printerSpinner.showDropDown(); // Εμφανίζει τη λίστα dropdown
+            }
+            return false;
+        });
 
-        btnSave.setOnClickListener(v -> saveServerAddress());
-        btnSync.setOnClickListener(view -> {
-            syncData();
+
+        ArrayList<String> printerTypes = new ArrayList<>();
+        printerTypes.add("TCP/IP");
+        printerTypes.add("myPOS");
+        printerTypes.add("Bluetooth");
+
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(this, R.layout.dropdown_menu_popup_item, printerTypes);
+        printerSpinner.setAdapter(adapter);
+
+        // Εξασφάλισε ότι η λίστα εμφανίζεται πάντα όταν ο χρήστης πατά στο πεδίο
+        printerSpinner.setOnFocusChangeListener((view, hasFocus) -> {
+            if (hasFocus) {
+                printerSpinner.showDropDown();
+            }
+        });
+
+        printerSpinner.setOnClickListener(v -> printerSpinner.showDropDown());
+
+        printerSpinner.setOnItemClickListener((parent, view, position, id) -> {
+            togglePrinterIPVisibility();
         });
     }
+
+    private void togglePrinterIPVisibility() {
+        String selectedPrinter = printerSpinner.getText().toString();
+        if ("TCP/IP".equals(selectedPrinter)) {
+            textPrinterIP1.setVisibility(View.VISIBLE);
+            textPrinterIP.setVisibility(View.VISIBLE);
+        } else {
+            textPrinterIP1.setVisibility(View.GONE);
+            textPrinterIP.setVisibility(View.GONE);
+        }
+    }
+
+
     private void syncData() {
         progressBar.setVisibility(View.VISIBLE);
         btnSync.setEnabled(false);
